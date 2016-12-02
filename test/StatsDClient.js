@@ -42,6 +42,11 @@ describe('StatsDClient', function () {
             s.expectMessage('abc:-5|c', done);
         });
 
+        it('.counter("abc", -5, ["tag:coolstuff"]) → "abc:-5|c|#tag:coolstuff', function (done) {
+            c.counter('abc', -5, ["tag:coolstuff"]);
+            s.expectMessage('abc:-5|c|#tag:coolstuff', done);
+        });
+
         it('.increment("abc") → "abc:1|c', function (done) {
             c.increment('abc');
             s.expectMessage('abc:1|c', done);
@@ -52,6 +57,11 @@ describe('StatsDClient', function () {
             s.expectMessage('abc:10|c', done);
         });
 
+        it('.increment("abc", 10, ["here:are", "some:tags"]) → "abc:10|c|#here:are,some:tags', function (done) {
+            c.increment('abc', 10, ["here:are", "some:tags"]);
+            s.expectMessage('abc:10|c|#here:are,some:tags', done);
+        });
+
         it('.decrement("abc", -2) → "abc:-2|c', function (done) {
             c.decrement('abc', -2);
             s.expectMessage('abc:-2|c', done);
@@ -60,6 +70,11 @@ describe('StatsDClient', function () {
         it('.decrement("abc", 3) → "abc:-3|c', function (done) {
             c.decrement('abc', -3);
             s.expectMessage('abc:-3|c', done);
+        });
+
+        it('.decrement("abc", 5, ["here:are", "some:tags"]) → "abc:-5|c|#here:are,some:tags', function (done) {
+            c.decrement('abc', -5, ["here:are", "some:tags"]);
+            s.expectMessage('abc:-5|c|#here:are,some:tags', done);
         });
 
         it('.counter("abc", 0) → "abc:0|c', function (done) {
@@ -79,6 +94,11 @@ describe('StatsDClient', function () {
             s.expectMessage('gauge:3|g', done);
         });
 
+        it('.gauge("gauge", 5, ["gauge:tags"]) → "gauge:5|g|#gauge:tags', function (done) {
+            c.gauge('gauge', 5, ["gauge:tags"]);
+            s.expectMessage('gauge:5|g|#gauge:tags', done);
+        });
+
         it('.gaugeDelta("gauge", 3) → "gauge:+3|g', function (done) {
             c.gaugeDelta('gauge', 3);
             s.expectMessage('gauge:+3|g', done);
@@ -88,12 +108,22 @@ describe('StatsDClient', function () {
             c.gaugeDelta('gauge', -3);
             s.expectMessage('gauge:-3|g', done);
         });
+
+        it('.gaugeDelta("gauge", 5, ["gauge:tags"]) → "gauge:5|g|#gauge:tags', function (done) {
+            c.gaugeDelta('gauge', 5, ["gauge:tags"]);
+            s.expectMessage('gauge:+5|g|#gauge:tags', done);
+        });
     });
 
     describe('Sets', function () {
         it('.set("foo", 10) → "foo:10|s', function (done) {
             c.set('foo', 10);
             s.expectMessage('foo:10|s', done);
+        });
+
+        it('.set("foo", 10, ["set:some", "tags:here"]) → "foo:10|s|#set:some,tags:here', function (done) {
+            c.set('foo', 10, ["set:some", "tags:here"]);
+            s.expectMessage('foo:10|s|#set:some,tags:here', done);
         });
     });
 
@@ -102,12 +132,22 @@ describe('StatsDClient', function () {
             c.histogram('foo', 10);
             s.expectMessage('foo:10|h', done);
         });
+
+        it('.histogram("foo", 10, ["histogram:needs", "tags:too"]) → "foo:10|h|#histogram:needs,tags:too', function (done) {
+            c.histogram('foo', 10, ["histogram:needs", "tags:too"]);
+            s.expectMessage('foo:10|h|#histogram:needs,tags:too', done);
+        });
     });
 
     describe('Timers', function () {
         it('.timing("foo", 10) → "foo:10|ms', function (done) {
             c.timing('foo', 10);
             s.expectMessage('foo:10|ms', done);
+        });
+
+        it('.timing("foo", 10, ["time:tags"]) → "foo:10|ms|#time:tags', function (done) {
+            c.timing('foo', 10, ["time:tags"]);
+            s.expectMessage('foo:10|ms|#time:tags', done);
         });
 
         it('.timing("foo", new Date(-20ms)) ~→ "foo:20|ms"', function (done) {
